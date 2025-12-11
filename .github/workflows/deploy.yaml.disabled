@@ -1,0 +1,66 @@
+name: Deploy to Cloud Run
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:  # Allow manual triggering from GitHub UI
+
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Google Auth
+        id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Configure Docker for GCR
+        run: |
+          gcloud auth configure-docker gcr.io
+
+      - name: Deploy with Cloud Build
+        id: build
+        run: |
+          echo "Starting Cloud Build deployment..."
+          gcloud builds submit --config cloudbuild.yaml . \
+            --project $PROJECT_ID \
+            --substitutions=_SERVICE_NAME=$SERVICE_NAME,_REGION=$REGION
+          echo "Build completed successfully!"
+
+      - name: Get Service URL
+        id: get-url
+        run: |
+          SERVICE_URL=$(gcloud run services describe $SERVICE_NAME \
+            --region=$REGION \
+            --project=$PROJECT_ID \
+            --format='value(status.url)')
+          echo "service_url=$SERVICE_URL" >> $GITHUB_OUTPUT
+          echo "Service deployed at: $SERVICE_URL"
+
+      - name: Deployment Summary
+        run: |
+          echo "## Deployment Summary :rocket:" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Service Name:** $SERVICE_NAME" >> $GITHUB_STEP_SUMMARY
+          echo "- **Region:** $REGION" >> $GITHUB_STEP_SUMMARY
+          echo "- **Project ID:** $PROJECT_ID" >> $GITHUB_STEP_SUMMARY
+          echo "- **Service URL:** ${{ steps.get-url.outputs.service_url }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Test the deployment:" >> $GITHUB_STEP_SUMMARY
+          echo '```bash' >> $GITHUB_STEP_SUMMARY
+          echo "curl ${{ steps.get-url.outputs.service_url }}/health" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
