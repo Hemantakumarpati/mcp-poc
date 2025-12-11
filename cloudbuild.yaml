@@ -1,3 +1,4 @@
+# cloudbuild.yaml
 steps:
   # Build the container image
   - name: 'gcr.io/cloud-builders/docker'
@@ -13,14 +14,14 @@ steps:
     args:
       - 'run'
       - 'deploy'
-      - 'mcp-binance'
+      - '${_SERVICE_NAME}'          # <-- now uses substitution
       - '--image'
       - 'gcr.io/$PROJECT_ID/mcp-binance'
       - '--region'
-      - 'us-central1'
+      - '${_REGION}'                # <-- now uses substitution
       - '--platform'
       - 'managed'
-      - '--allow-unauthenticated' # Allow public access (remove if you want auth)
+      - '--allow-unauthenticated'
       - '--port'
       - '8080'
 
