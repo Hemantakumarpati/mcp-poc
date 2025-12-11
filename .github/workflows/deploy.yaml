@@ -6,6 +6,11 @@ on:
       - main
   workflow_dispatch:
 
+env:
+  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  REGION: us-central1
+  SERVICE_NAME: mcp-binance
+
 jobs:
   deploy:
     runs-on: self-hosted
@@ -26,6 +31,13 @@ jobs:
 
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
+        with:
+          install_components: true
+
+      - name: Install Cloud Run components
+        run: |
+          gcloud components install beta --quiet
+          gcloud components install alpha --quiet
 
       - name: Configure Docker for GCR
         run: gcloud auth configure-docker gcr.io
@@ -35,7 +47,7 @@ jobs:
         run: |
           echo "Starting Cloud Build deployment..."
           gcloud builds submit --config cloudbuild.yaml . \
-            --project ${{ secrets.GCP_PROJECT_ID }} \
+            --project $PROJECT_ID \
             --substitutions=_SERVICE_NAME=$SERVICE_NAME,_REGION=$REGION
           echo "Build completed successfully!"
 
@@ -51,8 +63,14 @@ jobs:
 
       - name: Deployment Summary
         run: |
-          echo "## Deployment Summary :rocket:" >> $GITHUB_STEP_SUMMARY
+          echo "## Deployment Summary 🚀" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "- **Service Name:** $SERVICE_NAME" >> $GITHUB_STEP_SUMMARY
           echo "- **Region:** $REGION" >> $GITHUB_STEP_SUMMARY
-          echo "- **Project ID:** $PROJECT_I_
+          echo "- **Project ID:** $PROJECT_ID" >> $GITHUB_STEP_SUMMARY
+          echo "- **Service URL:** ${{ steps.get-url.outputs.service_url }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Test the deployment:" >> $GITHUB_STEP_SUMMARY
+          echo '```bash' >> $GITHUB_STEP_SUMMARY
+          echo "curl ${{ steps.get-url.outputs.service_url }}/health" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
