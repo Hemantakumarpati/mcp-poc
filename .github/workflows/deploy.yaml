@@ -35,7 +35,7 @@ jobs:
         run: |
           echo "Starting Cloud Build deployment..."
           gcloud builds submit --config cloudbuild.yaml . \
-            --project $PROJECT_ID \
+            --project ${{ secrets.GCP_PROJECT_ID }} \
             --substitutions=_SERVICE_NAME=$SERVICE_NAME,_REGION=$REGION
           echo "Build completed successfully!"
 
