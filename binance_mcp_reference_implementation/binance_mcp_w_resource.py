@@ -57,6 +57,18 @@ def activity_log() -> str:
         return f.read()
 
 
+@mcp.resource("resource://symbol_map")
+def get_symbol_map() -> str:
+    """
+    Get a CSV map of crypto names to Binance symbols
+    """
+    return """crypto_name,symbol
+btc,BTCUSDT
+eth,ETHUSDT
+bitcoin,BTCUSDT
+ethereum,ETHUSDT"""
+
+
 @mcp.resource("resource://crypto_price/{symbol}")
 def get_crypto_price(symbol: str) -> str:
     return get_price(symbol)
