@@ -4,33 +4,31 @@ on:
   push:
     branches:
       - main
-  workflow_dispatch:  # Allow manual triggering from GitHub UI
-
+  workflow_dispatch:
 
 jobs:
   deploy:
     runs-on: self-hosted
     permissions:
-      contents: 'read'
-      id-token: 'write'
+      contents: read
+      id-token: write
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Google Auth
+      - name: Google Auth (WIF)
         id: auth
         uses: google-github-actions/auth@v2
         with:
-          workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
-          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
+          service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
 
-      - name: Set up Cloud SDK 
+      - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
 
       - name: Configure Docker for GCR
-        run: |
-          gcloud auth configure-docker gcr.io
+        run: gcloud auth configure-docker gcr.io
 
       - name: Deploy with Cloud Build
         id: build
@@ -57,10 +55,4 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "- **Service Name:** $SERVICE_NAME" >> $GITHUB_STEP_SUMMARY
           echo "- **Region:** $REGION" >> $GITHUB_STEP_SUMMARY
-          echo "- **Project ID:** $PROJECT_ID" >> $GITHUB_STEP_SUMMARY
-          echo "- **Service URL:** ${{ steps.get-url.outputs.service_url }}" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### Test the deployment:" >> $GITHUB_STEP_SUMMARY
-          echo '```bash' >> $GITHUB_STEP_SUMMARY
-          echo "curl ${{ steps.get-url.outputs.service_url }}/health" >> $GITHUB_STEP_SUMMARY
-          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "- **Project ID:** $PROJECT_I_
