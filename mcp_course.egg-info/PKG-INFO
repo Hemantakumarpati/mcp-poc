@@ -1,0 +1,22 @@
+Metadata-Version: 2.4
+Name: mcp-course
+Version: 0.1.0
+Summary: MCP Course projects
+Requires-Python: <3.14,>=3.11
+Requires-Dist: click==8.1.7
+Requires-Dist: mcp[cli]==1.9.2
+Requires-Dist: requests==2.32.3
+Requires-Dist: python-dotenv==1.1.0
+Requires-Dist: google-generativeai==0.8.5
+Requires-Dist: ipykernel>=6.29.5
+Requires-Dist: ipywidgets>=8.1.6
+Requires-Dist: langchain==0.3.26
+Requires-Dist: langchain-openai==0.3.27
+Requires-Dist: langchain-core==0.3.68
+Requires-Dist: langchain-mcp-adapters==0.1.9
+Requires-Dist: langgraph==0.5.2
+Requires-Dist: langchain-google-genai==2.0.10
+Requires-Dist: black>=25.1.0
+Provides-Extra: ci
+Requires-Dist: pytest; extra == "ci"
+Requires-Dist: pytest-dotenv; extra == "ci"

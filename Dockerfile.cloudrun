@@ -1,0 +1,23 @@
+# Same base as before
+FROM ghcr.io/astral-sh/uv:python3.11-bookworm-slim
+
+WORKDIR /app
+ENV UV_COMPILE_BYTECODE=1
+
+# Copy project definition
+COPY uv.lock pyproject.toml /app/
+
+# Install dependencies
+RUN uv sync --frozen --no-install-project --no-dev
+
+# Copy source
+COPY . /app/
+
+# Path
+ENV PATH="/app/.venv/bin:$PATH"
+
+# Environment variables for Cloud Run
+ENV PORT=8080
+
+# Run the SSE adapter script
+CMD ["python", "binance_mcp_sse.py"]

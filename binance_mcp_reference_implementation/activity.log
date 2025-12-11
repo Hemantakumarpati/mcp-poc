@@ -1,0 +1,9 @@
+Error getting price change for XXXXXXUSDT: 451 {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+Error getting price change for BTCUSDT: 451 {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+}
+Successfully got price change for BTCUSDT. Current price is 90692.59000000. Current time is 2025-12-11 19:08:10.600969+00:00

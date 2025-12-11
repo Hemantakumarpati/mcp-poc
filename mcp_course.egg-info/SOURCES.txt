@@ -1,0 +1,7 @@
+pyproject.toml
+binance_mcp/binance_mcp.py
+mcp_course.egg-info/PKG-INFO
+mcp_course.egg-info/SOURCES.txt
+mcp_course.egg-info/dependency_links.txt
+mcp_course.egg-info/requires.txt
+mcp_course.egg-info/top_level.txt

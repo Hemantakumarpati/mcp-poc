@@ -1,0 +1,11 @@
+C:\Users\heman\learning\mcp-poc\binance_mcp\binance_mcp.py
+
+# to get the [ath in windows run the below Scripts]
+Python: C:\Users\heman\learning\mcp-poc\.venv\Scripts\python.exe
+
+((Get-Command python).Path) -replace '\\', '/'
+it will become
+python :C:/Users/heman/learning/mcp-poc/.venv/Scripts/python.exe
+
+
+C:/Users/heman/learning/mcp-poc/binance_mcp/binance_mcp.py
