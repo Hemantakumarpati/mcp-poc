@@ -19,7 +19,7 @@ jobs:
       id-token: write
 
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Google Auth (WIF)
@@ -29,17 +29,19 @@ jobs:
           workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
           service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
 
-      - name: Set up Cloud SDK
+      - name: Install Google Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
         with:
-          install_components: true
+          version: latest
+          install_components: beta,alpha
 
-      - name: Install Cloud Run components
+      - name: Verify gcloud + Cloud Run components
         run: |
-          gcloud components install beta --quiet
-          gcloud components install alpha --quiet
+          gcloud --version
+          gcloud components list
+          gcloud run --help | head -20
 
-      - name: Configure Docker for GCR
+      - name: Authenticate Docker for GCR
         run: gcloud auth configure-docker gcr.io
 
       - name: Deploy with Cloud Build
@@ -47,18 +49,19 @@ jobs:
         run: |
           echo "Starting Cloud Build deployment..."
           gcloud builds submit --config cloudbuild.yaml . \
-            --project $PROJECT_ID \
-            --substitutions=_SERVICE_NAME=$SERVICE_NAME,_REGION=$REGION
+            --project "$PROJECT_ID" \
+            --substitutions=_SERVICE_NAME="$SERVICE_NAME",_REGION="$REGION"
           echo "Build completed successfully!"
 
-      - name: Get Service URL
+      - name: Get Cloud Run Service URL
         id: get-url
         run: |
-          SERVICE_URL=$(gcloud run services describe $SERVICE_NAME \
-            --region=$REGION \
-            --project=$PROJECT_ID \
+          SERVICE_URL=$(gcloud run services describe "$SERVICE_NAME" \
+            --region "$REGION" \
+            --project "$PROJECT_ID" \
             --format='value(status.url)')
-          echo "service_url=$SERVICE_URL" >> $GITHUB_OUTPUT
+          
+          echo "service_url=$SERVICE_URL" >> "$GITHUB_OUTPUT"
           echo "Service deployed at: $SERVICE_URL"
 
       - name: Deployment Summary
