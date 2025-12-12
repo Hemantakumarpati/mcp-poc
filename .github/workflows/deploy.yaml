@@ -22,43 +22,38 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Google Auth (WIF)
-        id: auth
+      - name: Authenticate with Google (WIF)
+        id: gcp-auth
         uses: google-github-actions/auth@v2
         with:
           workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
           service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
 
-      - name: Install Google Cloud SDK
-        uses: google-github-actions/setup-gcloud@v2
-        with:
-          version: latest
-          install_components: beta,alpha
-
-      - name: Verify gcloud + Cloud Run components
+      - name: Verify Cloud SDK (Already Installed)
         run: |
+          echo "Cloud SDK version:"
           gcloud --version
-          gcloud components list
+          echo "Cloud Run commands available:"
           gcloud run --help | head -20
 
-      - name: Authenticate Docker for GCR
+      - name: Configure Docker for GCR
         run: gcloud auth configure-docker gcr.io
 
-      - name: Deploy with Cloud Build
-        id: build
+      - name: Deploy via Cloud Build
+        id: cloud-build
         run: |
-          echo "Starting Cloud Build deployment..."
+          echo "Submitting Cloud Build..."
           gcloud builds submit --config cloudbuild.yaml . \
             --project "$PROJECT_ID" \
             --substitutions=_SERVICE_NAME="$SERVICE_NAME",_REGION="$REGION"
-          echo "Build completed successfully!"
+          echo "Build finished successfully!"
 
-      - name: Get Cloud Run Service URL
+      - name: Get Cloud Run URL
         id: get-url
         run: |
           SERVICE_URL=$(gcloud run services describe "$SERVICE_NAME" \
-            --region "$REGION" \
-            --project "$PROJECT_ID" \
+            --region="$REGION" \
+            --project="$PROJECT_ID" \
             --format='value(status.url)')
           
           echo "service_url=$SERVICE_URL" >> "$GITHUB_OUTPUT"
@@ -67,13 +62,12 @@ jobs:
       - name: Deployment Summary
         run: |
           echo "## Deployment Summary 🚀" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
           echo "- **Service Name:** $SERVICE_NAME" >> $GITHUB_STEP_SUMMARY
           echo "- **Region:** $REGION" >> $GITHUB_STEP_SUMMARY
           echo "- **Project ID:** $PROJECT_ID" >> $GITHUB_STEP_SUMMARY
           echo "- **Service URL:** ${{ steps.get-url.outputs.service_url }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### Test the deployment:" >> $GITHUB_STEP_SUMMARY
+          echo "### Test endpoint:" >> $GITHUB_STEP_SUMMARY
           echo '```bash' >> $GITHUB_STEP_SUMMARY
           echo "curl ${{ steps.get-url.outputs.service_url }}/health" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
