@@ -1145,6 +1145,7 @@ dependencies = [
     { name = "mcp", extra = ["cli"] },
     { name = "python-dotenv" },
     { name = "requests" },
+    { name = "uvicorn" },
 ]
 
 [package.optional-dependencies]
@@ -1185,6 +1186,7 @@ requires-dist = [
     { name = "pytest-dotenv", marker = "extra == 'ci'" },
     { name = "python-dotenv", specifier = "==1.1.0" },
     { name = "requests", specifier = "==2.32.3" },
+    { name = "uvicorn", specifier = ">=0.30.0" },
 ]
 provides-extras = ["ci"]
 
