@@ -8,7 +8,7 @@ steps:
     args: ['push', 'gcr.io/$PROJECT_ID/mcp-binance']
 
   # Deploy container image to Cloud Run (using SDK with all components)
-  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:latest-with-components'
+  - name: 'gcr.io/google.com/cloudsdktool/google-cloud-cli:latest'
     entrypoint: gcloud
     args:
       - 'run'
