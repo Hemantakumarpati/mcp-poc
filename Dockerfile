@@ -26,4 +26,4 @@ ENV PATH="/app/.venv/bin:$PATH"
 
 # Set the default command to run the MCP server
 # Using the JSON-RPC transport via stdio is the standard for MCP
-CMD ["python", "binance_mcp_reference_implementation/binance_mcp_w_resource.py"]
+CMD ["python", "binance_mcp_sse.py"]
