@@ -22,7 +22,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Authenticate with Google (WIF) 
+      - name: Authenticate with Google (WIF)
         id: gcp-auth
         uses: google-github-actions/auth@v2
         with:
@@ -45,6 +45,7 @@ jobs:
           echo "Submitting Cloud Build..."
           gcloud builds submit --config cloudbuild.yaml . \
             --project "$PROJECT_ID" \
+            --suppress-logs \
             --substitutions=_SERVICE_NAME="$SERVICE_NAME",_REGION="$REGION"
           echo "Build finished successfully!"
 
